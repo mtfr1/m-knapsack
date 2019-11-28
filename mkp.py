@@ -1,42 +1,79 @@
+import numpy as np
 import pulp
 
+# model
+def mkp(items, values, a, b):
+	model = pulp.LpProblem("MKP", pulp.LpMaximize)
 
-items = [1, 2, 3, 4]
-values = {1:16, 2:19, 3:23, 4:28}
-a = {1 : {1 : 2, 2 : 3000},
-	 2 : {1 : 3, 2 : 3500},
-	 3 : {1 : 4, 2 : 5100},
-	 4 : {1 : 5, 2:  7200}}
-b = {1 : 7, 2 : 10000}
+	item_ch = pulp.LpVariable.dicts("Item", items, 0, 1, pulp.LpBinary)
+	model += pulp.lpSum(values[j]*item_ch[j] for j in items) #objective function
+	
+	for i in b:
+		model += pulp.lpSum(a[j][i]*item_ch[j] for j in items) <= b[i] #constraints
+
+	return model
+
+n_tests = int(input())
+
+for _ in range(n_tests):
+	input()
+	n, m, opt = map(float, input().split())
+	n, m = int(n), int(m)
+	sol = list(map(float, input().split()))
+	
+	items = [i for i in range(n)]
+
+	pj = list(map(float, input().split()))
+	values = {}
+	for j in range(n):
+		values[j] = pj[j]
+	
+	a = {}
+	matrix = []
+	for i in range(m):
+		line = list(map(int, input().split()))
+		matrix.append(line)
+	
+	matrix = np.array(matrix)
+	matrix = matrix.T
+	print(matrix)
+	for i in range(n):
+		constraint = {}
+		for j in range(m):
+			constraint[j] = matrix[i][j]
+		a[i] = constraint
+
+	bi = list(map(float, input().split()))
+	b = {}
+	for i in range(m):
+		b[i] = bi[i]
 
 
-item_ch = pulp.LpVariable.dicts("Item", items, 0, 1, pulp.LpBinary)
+	model = mkp(items, values, a, b)
+
+	solver = pulp.CPLEX_PY()
+	solver.buildSolverModel(model)
+	model.solverModel.parameters.timelimit.set(1800)
 
 
-model = pulp.LpProblem("MKP", pulp.LpMaximize)
+	start_time = model.solverModel.get_time()
+	solver.callSolver(model)
+	end_time = model.solverModel.get_time()
 
-model += pulp.lpSum(values[j]*item_ch[j] for j in items)
+	instance_size =  len(items) + len(b)
+	time = end_time - start_time
+	best_sol = model.solverModel.solution.get_objective_value()
+	best_bound = model.solverModel.solution.MIP.get_best_objective()
+	gap = model.solverModel.solution.MIP.get_mip_relative_gap() * 100
 
-for i in b:
-	model += pulp.lpSum(a[j][i]*item_ch[j] for j in items) <= b[i]
+	print("Tamanho da instancia = %d" % instance_size)
+	print("Tempo gasto = %f" % time)
+	print("Melhor solucao = %f" % best_sol)
+	print("Melhor bound = %f" % best_bound)
+	print("Gap de otimalidade = %f" % gap)
 
-solver = pulp.CPLEX_PY()
-solver.buildSolverModel(model)
-model.solverModel.parameters.timelimit.set(1800)
-
-
-start_time = model.solverModel.get_time()
-solver.callSolver(model)
-end_time = model.solverModel.get_time()
-
-instance_size =  len(items) + len(b)
-time = end_time - start_time
-best_sol = model.solverModel.solution.get_objective_value()
-best_bound = model.solverModel.solution.MIP.get_best_objective()
-gap = model.solverModel.solution.MIP.get_mip_relative_gap() * 100
-
-print("Tamanho da instancia = %d" % instance_size)
-print("Tempo gasto = %f" % time)
-print("Melhor solucao = %f" % best_sol)
-print("Melhor bound = %f" % best_bound)
-print("Gap de otimalidade = %f" % gap)
+	try:
+		input()
+	except EOFError:
+		break
+		
