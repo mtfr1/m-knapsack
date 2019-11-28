@@ -17,7 +17,7 @@ n_tests = int(input())
 for _ in range(n_tests):
 	n, m, opt = map(float, input().split())
 	n, m = int(n), int(m)
-	
+
 	items = [i for i in range(n)]
 
 	pj = list(map(float, input().split()))
@@ -57,15 +57,28 @@ for _ in range(n_tests):
 	solver.callSolver(model)
 	end_time = model.solverModel.get_time()
 
-	instance_size =  len(items) + len(b)
-	time = end_time - start_time
-	best_sol = model.solverModel.solution.get_objective_value()
-	best_bound = model.solverModel.solution.MIP.get_best_objective()
-	gap = model.solverModel.solution.MIP.get_mip_relative_gap() * 100
+	n = str(len(items))
+	m = str(len(b))
+	if _ < 10:
+		tightness = "0.25"
+	elif 10 <= _ and _ < 20:
+		tightness = "0.5"
+	else:
+		tightness = "0.75"
+	time = str(end_time - start_time)
+	best_sol = str(model.solverModel.solution.get_objective_value())
+	best_bound = str(model.solverModel.solution.MIP.get_best_objective())
+	gap = str(model.solverModel.solution.MIP.get_mip_relative_gap() * 100)
 
-	print("Tamanho da instancia = %d" % instance_size)
-	print("Tempo gasto = %f" % time)
-	print("Melhor solucao = %f" % best_sol)
-	print("Melhor bound = %f" % best_bound)
-	print("Gap de otimalidade = %f" % gap)
+	# print("Tamanho da instancia = %d" % instance_size)
+	# print("Tempo gasto = %f" % time)
+	# print("Melhor solucao = %f" % best_sol)
+	# print("Melhor bound = %f" % best_bound)
+	# print("Gap de otimalidade = %f" % gap)
+
+	with open('results.csv', 'a') as f:
+		f.write(n +","+ m + "," + tightness + "," +
+    			time + "," + best_sol + "," + best_bound + "," +
+    			gap + "\n")
+
 		
