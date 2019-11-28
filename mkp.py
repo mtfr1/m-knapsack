@@ -14,20 +14,17 @@ def mkp(items, values, a, b):
 	return model
 
 n_tests = int(input())
-
 for _ in range(n_tests):
-	input()
 	n, m, opt = map(float, input().split())
 	n, m = int(n), int(m)
-	sol = list(map(float, input().split()))
 	
 	items = [i for i in range(n)]
 
 	pj = list(map(float, input().split()))
-	values = {}
+	values = {}	
 	for j in range(n):
 		values[j] = pj[j]
-	
+
 	a = {}
 	matrix = []
 	for i in range(m):
@@ -36,7 +33,7 @@ for _ in range(n_tests):
 	
 	matrix = np.array(matrix)
 	matrix = matrix.T
-	print(matrix)
+
 	for i in range(n):
 		constraint = {}
 		for j in range(m):
@@ -71,9 +68,4 @@ for _ in range(n_tests):
 	print("Melhor solucao = %f" % best_sol)
 	print("Melhor bound = %f" % best_bound)
 	print("Gap de otimalidade = %f" % gap)
-
-	try:
-		input()
-	except EOFError:
-		break
 		
