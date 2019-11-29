@@ -59,9 +59,9 @@ for _ in range(n_tests):
 
 	n = str(len(items))
 	m = str(len(b))
-	if _ < 10:
+	if _ == 0:
 		tightness = "0.25"
-	elif 10 <= _ and _ < 20:
+	elif _ == 1:
 		tightness = "0.5"
 	else:
 		tightness = "0.75"
